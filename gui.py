@@ -151,11 +151,33 @@ def run_uta(window, no_of_sections = None, usability_values = None):
 
 
 def run_rsm(window, point_lst, Aquo, Adoc):
-    rank = rsm(point_lst, Aquo, Adoc)
-    # print(rank)
+    array = get_rsm(point_lst, Aquo, Adoc)
 
     names = columns_name.copy()
     names.append("ci")
+
+    df_rank = pd.DataFrame(array, columns=names)
+    show_ranking(window, df_rank, "Ranking RSM")
+
+
+def get_rsm(point_lst, Aquo, Adoc):
+    copy_points = np.copy(point_lst)
+    copy_Adoc = np.copy(Adoc)
+    copy_Aquo = np.copy(Aquo)
+
+    copy_points[:, range(3, 7)] = -copy_points[:, range(3, 7)]
+    copy_Adoc[:, range(3, 7)] = -copy_Adoc[:, range(3, 7)]
+    copy_Aquo[:, range(3, 7)] = -copy_Aquo[:, range(3, 7)]
+
+    if Adoc[0][6] == 0:
+        copy_points[:, 6] = -copy_points[:, 6]
+        Adoc[:, 6] = -Adoc[:, 6]
+
+    if Adoc[0][5] == 0:
+        copy_points[:, 5] = -copy_points[:, 5]
+        Adoc[:, 5] = -Adoc[:, 5]
+
+    rank = rsm(copy_points, copy_Adoc, copy_Aquo)
 
     array = np.array([])
     array1 = np.array([])
@@ -165,28 +187,63 @@ def run_rsm(window, point_lst, Aquo, Adoc):
         array1 = np.append(array1, [x[1]], axis=0)
 
     array = array.reshape((len(rank), 7))
+    array[:, range(3, 7)] = -array[:, range(3, 7)]
     array = np.append(array, np.vstack(array1), axis=1)
 
-    df_rank = pd.DataFrame(array, columns=names)
-    show_ranking(window, df_rank, "Ranking RSM")
+    array[:, range(3, 7)] = array[:, range(3, 7)]
+
+    if Adoc[0][6] == 0:
+        array[:, 6] = -array[:, 6]
+
+    if Adoc[0][5] == 0:
+        array[:, 5] = -array[:, 5]
+
+    array = array[::-1]
+    return array
 
 
 def run_topsis(window, points, weights, ideal_point):
-    # Change max -> -1 * min
-    copy_points = np.copy(points)
-    copy_points[:, range(3, 7, 1)] = -copy_points[:, range(3, 7, 1)]
-    ideal_point_copy = np.copy(ideal_point)
-    ideal_point_copy[:, range(3, 7, 1)] = -ideal_point_copy[:, range(3, 7, 1)]
-
-    rank = topsis(copy_points, weights, ideal_point_copy)
-    rank[:, range(3, 7, 1)] = -rank[:, range(3, 7, 1)]
-
-    rank = rank[::-1]
+    rank = get_topsis(points, weights, ideal_point)
     names = columns_name.copy()
     names.append("ci")
 
     df_rank = pd.DataFrame(rank, columns=names, dtype="float")
     show_ranking(window, df_rank, "Ranking topsis")
+
+
+def get_topsis(points, weights, ideal_point):
+    # Change max -> -1 * min
+    copy_points = np.copy(points)
+    copy_points[:, range(3, 7)] = -copy_points[:, range(3, 7)]
+
+    ideal_point_copy = np.copy(ideal_point)
+    ideal_point_copy[:, range(3, 7, 1)] = -ideal_point_copy[:, range(3, 7, 1)]
+
+    if ideal_point[0][6] == 0:
+        copy_points[:, 6] = -copy_points[:, 6]
+        ideal_point_copy[:, 6] = -ideal_point_copy[:, 6]
+
+    if ideal_point[0][5] == 0:
+        copy_points[:, 5] = -copy_points[:, 5]
+        ideal_point_copy[:, 5] = -ideal_point_copy[:, 5]
+
+    rank = topsis(copy_points, weights, ideal_point_copy)
+    rank[:, range(3, 7, 1)] = -rank[:, range(3, 7, 1)]
+
+    if ideal_point[0][6] == 0:
+        rank[:, 6] = -rank[:, 6]
+
+    if ideal_point[0][5] == 0:
+        rank[:, 5] = -rank[:, 5]
+
+    rank = rank[::-1]
+    return rank
+
+
+def run_all(window, points, ideal_point, weights, Aquo, Adoc, no_of_sections, usability_values):
+    topsis_rank = get_topsis(points, weights, ideal_point)
+    rsm_rank = get_rsm(points, Aquo, Adoc)
+    uta_rank = uta("SWD_baza_danych.xlsx", no_of_sections, usability_values)
 
 
 def non_dominated(points):

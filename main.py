@@ -10,6 +10,7 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
     excel_data = pd.read_excel("SWD_baza_danych.xlsx", dtype='int32')
     ideal_point = np.array([[0, 0, 0, 100, 10, 1, 1]])
+    # anty_ideal_point = np.array([[1e10, 1e10, 1e10, 0, 0, 0, 0]])
     anty_ideal_point = non_dominated(excel_data.to_numpy())
 
     # Window App
@@ -35,11 +36,13 @@ if __name__ == '__main__':
     go_rsm = partial(run_rsm, window, excel_data.to_numpy(), ideal_point, anty_ideal_point)
     go_uta = partial(run_uta, window, przedzialy, wartosci)
     run_ideal = partial(open_ideal, window, ideal_point)
+    # run_all = partial()
 
     # Buttons
     button = tk.Button(button_frame, text="Topsis", command=topsis)
     button1 = tk.Button(button_frame, text="RSM", command=go_rsm)
     button2 = tk.Button(button_frame, text="UTA", command=go_uta)
+    # button_all = tk.Button(button_frame, text="Porównanie", command=go_uta)
     button_weight = tk.Button(button_frame, text="Wagi", command=open_weights)
     button_ideal = tk.Button(button_frame, text="Punkt idealny", command=run_ideal)
 

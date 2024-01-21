@@ -48,29 +48,50 @@ def rectangles(Aquo, Adoc):
 
 def rsm(point_list, Aquo, Adoc):
     point_list = undominated_points(point_list)
+
     Aquo = undominated_points(Aquo)
     Adoc = undominated_points(Adoc)
 
+    # Aquo = np.tile(Aquo[0, :], (7, 1))
+    # Adoc = np.tile(Adoc[0, :], (7, 1))
+    # print(f"Aquo {Aquo}")
+    # print(f"Adoc {Adoc}")
+
     X = point_list
     P = rectangles(Aquo, Adoc)
+    # print(P)
+
     s = 0
-    for i in range(len(Aquo[0])):
-        s = s + sum(P[i])
+    for i in range(len(P)):
+        s += sum(P[i])
+
+    # s = 0
+    # for i in range(len(Aquo[0])):
+    #     s = s + sum(P[i])
 
     suma = s
     P = np.array(P)
+    # print(point_list)
 
+    # print(f"Suma: {suma}")
     w = P / suma
     R = []
     for p in point_list:
         r = 0
         for x, i in enumerate(Adoc):
             for y, j in enumerate(Aquo):
-                if np.all((i < p) & (p < j)):
-                    r = r + w[x][y] * (np.linalg.norm(p - i)) / (np.linalg.norm(p - j) + (np.linalg.norm(p - j)))
+                # print(f"i = \n{i}")
+                # print(f"p = \n{p}")
+                # print(f"j = \n{j}")
+                # print(f"i < p = \n{i < p}")
+                # print(f"p < j = \n{p < j}")
+                if np.all((i <= p) & (p <= j)):
+                    r = r + w[x][y] * (np.linalg.norm(p - j)) / (np.linalg.norm(p - i) + (np.linalg.norm(p - j)))
+        # print(f"r: {r}")
         R.append([p, r])
 
     r = sorted(R, key=lambda x: x[1])
+    # print(r)
     return r
 
 
