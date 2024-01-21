@@ -1,5 +1,6 @@
 from openpyxl import load_workbook
 from copy import copy
+import numpy as np
 
 
 # Funkcja do załadowania danych z pliku bazy danych i wrzucenia ich do zmiennej
@@ -144,14 +145,28 @@ def uta(file_path: str, no_of_sections=None, usability_values=None):
     scoring = calculate_scoring(a, b, sorted_data, sections_tuples)
     ranking = calculate_ranking(scoring, sorted_data)
 
+    rank = np.array([])
+    value = np.array([])
+
     for i in range(len(data[0])):
         criteria_idx = 0
         print_string = "Miejsce " + str(i + 1) + " (wartość funkcji użyteczności: " + str(ranking[-1][i]) + \
                        ") zajmuje mieszkanie z parametrami: "
+        value = np.append(value, ranking[-1][i])
+        tmp_lst = np.array([[]])
+
         for lst in ranking[:-1]:
             print_string += str(criteria[criteria_idx]) + " " + str(lst[i]) + " "
             criteria_idx += 1
-        print(print_string)
+            tmp_lst = np.append(tmp_lst, lst[i])
+        # print(print_string)
+        rank = np.append(rank, tmp_lst, axis=0)
+
+    value = np.vstack(value)
+    rank = rank.reshape((len(value), 7))
+    rank = np.append(rank, value, axis=1)
+
+    return rank
 
 
 if __name__ == '__main__':

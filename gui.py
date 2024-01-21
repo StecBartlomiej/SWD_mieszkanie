@@ -7,6 +7,7 @@ from pandastable import Table
 from math import isclose
 from rsm import rsm
 from topis_implementacja import topsis
+from uta import uta
 
 
 
@@ -137,6 +138,16 @@ def open_ideal(root, ideal_point):
     button = tk.Button(subwindow, text="Ok", command=copy_close)
     max_row = 7
     button.grid(row=max_row, column=1)
+
+
+def run_uta(window, no_of_sections = None, usability_values = None):
+    rank = uta("SWD_baza_danych.xlsx", no_of_sections, usability_values)
+
+    names = columns_name.copy()
+    names.append("Funkcja użyteczności")
+
+    df = pd.DataFrame(rank, columns=names)
+    show_ranking(window, df, "Ranking UTA")
 
 
 def run_rsm(window, point_lst, Aquo, Adoc):

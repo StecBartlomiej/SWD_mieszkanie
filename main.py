@@ -5,8 +5,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # TODO 1.1 topsis naprawa wag
-# TODO 2 - add rsm
-# TODO 3 - add UTA
 # TODO 3.1 - add subwindow for uta
 
 
@@ -37,13 +35,13 @@ if __name__ == '__main__':
     # Methods
     topsis = partial(run_topsis, window, excel_data.to_numpy(), weights, ideal_point)
     go_rsm = partial(run_rsm, window, excel_data.to_numpy(), ideal_point, anty_ideal_point)
-    run_uta = partial(uta, "SWD_baza_danych.xlsx", przedzialy, wartosci)
+    go_uta = partial(run_uta, window, przedzialy, wartosci)
     run_ideal = partial(open_ideal, window, ideal_point)
 
     # Buttons
     button = tk.Button(button_frame, text="Topsis", command=topsis)
     button1 = tk.Button(button_frame, text="RSM", command=go_rsm)
-    button2 = tk.Button(button_frame, text="UTA", command=run_uta)
+    button2 = tk.Button(button_frame, text="UTA", command=go_uta)
     button_weight = tk.Button(button_frame, text="Wagi", command=open_weights)
     button_ideal = tk.Button(button_frame, text="Punkt idealny", command=run_ideal)
 
