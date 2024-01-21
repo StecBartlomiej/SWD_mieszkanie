@@ -1,6 +1,5 @@
 from gui import *
 from functools import partial
-from uta import uta
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -28,9 +27,8 @@ if __name__ == '__main__':
     weights = [1 / 7 for _ in range(7)]
     open_weights = partial(show_weights, window, weights)
 
-    przedzialy = [2, 2, 2, 2, 2, 2, 2]  # każdy element chyba powinien być większy lub równy 2 ale nie jestem pewny
-    wartosci = [[0.2, 0.05, 0], [0.2, 0.12, 0], [0.2, 0.07, 0], [0.1, 0.02, 0], [0.1, 0.07, 0], [0.1, 0.03, 0],
-                [0.1, 0.09, 0]]
+    przedzialy = [2,2,2,2,2,2,2]
+    wartosci = [[5,0,0],[0,0,0],[0,0,0],[5,0,0],[0,0,0],[0,0,0],[0,0,0]]
 
     # Methods
     topsis = partial(run_topsis, window, excel_data.to_numpy(), weights, ideal_point)

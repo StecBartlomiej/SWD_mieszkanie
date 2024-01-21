@@ -37,11 +37,7 @@ def collect_no_of_sections(criteria: list):
 
 
 # Funkcja do dzielenia każdego kryterium na równe przedziały
-def create_sections(data: list, criteria: list, no_of_sections: list):
-    # # jeśli wcześniej nie była podana ilość przedziałów lub jeśli jest nieprawidłowa
-    # if (no_of_sections is None) or (len(no_of_sections) != len(criteria)):
-    #     no_of_sections = collect_no_of_sections(criteria)
-
+def create_sections(data:list, criteria:list, no_of_sections:list):
     min_values = [min(value_list) for value_list in data]
     max_values = [max(value_list) for value_list in data]
 
@@ -50,7 +46,7 @@ def create_sections(data: list, criteria: list, no_of_sections: list):
     sections = [[val] for val in min_values]
     for i in range(len(data)):
         incrementing_number = min_values[i]
-        for _ in range(no_of_sections[i] - 1):
+        for _ in range(no_of_sections[i]-1):
             incrementing_number += increment[i]
             sections[i].append(incrementing_number)
         sections[i].append(max_values[i])
@@ -60,7 +56,7 @@ def create_sections(data: list, criteria: list, no_of_sections: list):
 
     sections_as_tuples = []
     for sublist in sections:
-        tuple_list = [(sublist[i], sublist[i + 1]) for i in range(len(sublist) - 1)]
+        tuple_list = [(sublist[i], sublist[i+1]) for i in range(len(sublist)-1)]
         sections_as_tuples.append(tuple_list)
 
     return sections, sections_as_tuples
@@ -95,9 +91,9 @@ def usability_functions(sections: list, usability_values: list):
         each_a = []
         each_b = []
         for j in range(len(usability_values[i]) - 1):
-            a = (usability_values[i][j + 1] - usability_values[i][j]) / (sections[i][j + 1] - sections[i][j])
+            a = (usability_values[i][j+1] - usability_values[i][j]) / (sections[i][j+1] - sections[i][j])
             each_a.append(a)
-            each_b.append(usability_values[i][j + 1] - a * sections[i][j + 1])
+            each_b.append(usability_values[i][j+1] - a * sections[i][j+1])
         a_func.append(each_a)
         b_func.append(each_b)
 
@@ -141,6 +137,11 @@ def uta(file_path: str, no_of_sections=None, usability_values=None):
     sections, sections_tuples = create_sections(sorted_data, criteria, no_of_sections)
     if usability_values is None:
         usability_values = set_values_of_usability_functions(sections, criteria)
+    sum_for_ideal_point = sum([val[0] for val in usability_values])
+    if sum_for_ideal_point != 1:
+        for i in range(len(usability_values)):
+            for j in range(len(usability_values[i])):
+                usability_values[i][j] /= sum_for_ideal_point
     a, b = usability_functions(sections, usability_values)
     scoring = calculate_scoring(a, b, sorted_data, sections_tuples)
     ranking = calculate_ranking(scoring, sorted_data)
@@ -150,13 +151,13 @@ def uta(file_path: str, no_of_sections=None, usability_values=None):
 
     for i in range(len(data[0])):
         criteria_idx = 0
-        print_string = "Miejsce " + str(i + 1) + " (wartość funkcji użyteczności: " + str(ranking[-1][i]) + \
+        print_string = "Miejsce " + str(i+1) + " (wartość funkcji użyteczności: " + str(ranking[-1][i]) + \
                        ") zajmuje mieszkanie z parametrami: "
         value = np.append(value, ranking[-1][i])
         tmp_lst = np.array([[]])
 
         for lst in ranking[:-1]:
-            print_string += str(criteria[criteria_idx]) + " " + str(lst[i]) + " "
+            print_string += str(criteria[criteria_idx]) + ": " + str(lst[i]) + ", "
             criteria_idx += 1
             tmp_lst = np.append(tmp_lst, lst[i])
         # print(print_string)
@@ -175,7 +176,8 @@ if __name__ == '__main__':
 
     # jeśli chcesz żeby program nie pytał cię o ilość przedziałów i wartości funkcji użyteczności to zakomentuj następne
     # 2 linijki, w przeciwnym wypadku możesz wpisywać tutaj wartości manualnie
-    przedzialy = [2, 2, 2, 2, 2, 2, 2]  # każdy element chyba powinien być większy lub równy 2 ale nie jestem pewny
-    wartosci = [[0.2, 0.05, 0], [0.2, 0.12, 0], [0.2, 0.07, 0], [0.1, 0.02, 0], [0.1, 0.07, 0], [0.1, 0.03, 0],
-                [0.1, 0.09, 0]]
+    #przedzialy = [5,2,3,3,2,2,2] # każdy element chyba powinien być większy lub równy 2 ale nie jestem pewny
+    #wartosci = [[3, 0.3, 0.1, 0.07, 0.05, 0],[0.2, 0.12, 0],[0.2, 0.1, 0.07, 0],[3, 0.2, 0.1, 0],[0.1, 0.07, 0],[0.1, 0.03, 0],[0.1, 0.09, 0]]
+    przedzialy = [2,2,2,2,2,2,2]
+    wartosci = [[5,0,0],[0,0,0],[0,0,0],[5,0,0],[0,0,0],[0,0,0],[0,0,0]]
     uta("SWD_baza_danych.xlsx", przedzialy, wartosci)
