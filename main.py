@@ -1,9 +1,9 @@
 from gui import *
 from functools import partial
 import warnings
+
 warnings.filterwarnings("ignore")
 
-# TODO 1.1 topsis naprawa wag
 # TODO 3.1 - add subwindow for uta
 
 
@@ -27,8 +27,8 @@ if __name__ == '__main__':
     weights = [1 / 7 for _ in range(7)]
     open_weights = partial(show_weights, window, weights)
 
-    przedzialy = [2,2,2,2,2,2,2]
-    wartosci = [[5,0,0],[0,0,0],[0,0,0],[5,0,0],[0,0,0],[0,0,0],[0,0,0]]
+    przedzialy = [2, 2, 2, 2, 2, 2, 2]
+    wartosci = [[5, 0, 0], [0, 0, 0], [0, 0, 0], [5, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
     # Methods
     topsis = partial(run_topsis, window, excel_data.to_numpy(), weights, ideal_point)
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     button_ideal = tk.Button(button_frame, text="Punkt idealny", command=run_ideal)
 
     # layout
-    button.pack(side='left',  fill='x', pady=5, padx=10)
+    button.pack(side='left', fill='x', pady=5, padx=10)
     button1.pack(side='left', fill='x', pady=5, padx=10)
     button2.pack(side='left', fill='x', pady=5, padx=10)
     button_weight.pack(side='left', fill='x', pady=5, padx=10)

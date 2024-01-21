@@ -16,8 +16,8 @@ is_rsm_open = False
 
 
 columns_name = [
-    'Cena [zł]', 'czynsz [zł]', 'piętro', 'metraż [m^2]',
-    'Liczba pokoi', 'umeblowane', 'balkon'
+    'Cena [zł]', 'Czynsz [zł]', 'Piętro', 'Metraż [m^2]',
+    'Liczba pokoi', 'Umeblowane', 'Balkon'
 ]
 
 
@@ -64,7 +64,7 @@ def show_weights(window, weights):
     num_lst = [tk.DoubleVar(subwindow, value=x) for _, x in enumerate(weights)]
 
     for idx, x in enumerate(num_lst):
-        tk.Label(subwindow, text=f"Waga {idx}:").grid(row=idx, column=0, padx=5)
+        tk.Label(subwindow, text=f"{columns_name[idx]}").grid(row=idx, column=0, padx=5)
         tk.Entry(subwindow, textvariable=x).grid(row=idx, column=1, padx=4, sticky='news')
 
     def copy_weights():
@@ -175,10 +175,13 @@ def run_topsis(window, points, weights, ideal_point):
     # Change max -> -1 * min
     copy_points = np.copy(points)
     copy_points[:, range(3, 7, 1)] = -copy_points[:, range(3, 7, 1)]
+    ideal_point_copy = np.copy(ideal_point)
+    ideal_point_copy[:, range(3, 7, 1)] = -ideal_point_copy[:, range(3, 7, 1)]
 
-    rank = topsis(copy_points, weights, ideal_point)
+    rank = topsis(copy_points, weights, ideal_point_copy)
     rank[:, range(3, 7, 1)] = -rank[:, range(3, 7, 1)]
 
+    rank = rank[::-1]
     names = columns_name.copy()
     names.append("ci")
 

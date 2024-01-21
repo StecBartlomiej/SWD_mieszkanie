@@ -26,14 +26,52 @@ def normalize(points, weights):
 def topsis(points, weights, ideal_point):
     # np.set_printoptions(precision=4)
 
-    # normalizacja
-    norm_points = normalize(points, weights)
+    # # normalizacja
+    # norm_points = normalize(points, weights)
+    # # ======================================================================
+    # # punkty zdominowane
+    # non_dominated_points = norm_points
+    # temp_dom = []
+    #
+    # for i, point1 in enumerate(norm_points[:-1]):
+    #     temp_dom.append(point1)
+    #     for point2 in non_dominated_points:
+    #         # Usuwanie zdominowanych
+    #         if np.all(point1 > point2):
+    #             del_idx = np.all(np.equal(non_dominated_points, point1), axis=1)
+    #             non_dominated_points = np.delete(non_dominated_points, del_idx, 0)
+    #             break
+    #     else:
+    #         # Filtracja
+    #         for point2 in norm_points[i:]:
+    #             if np.all(point1 < point2):
+    #                 del_idx = np.all(np.equal(non_dominated_points, point2), axis=1)
+    #                 non_dominated_points = np.delete(non_dominated_points, del_idx, 0)
+    #                 # print(f"{point1} deleted {point2}")
+    #
+    # non_dominated_points_not_normalized = np.copy(points)
+    # for i, point1 in enumerate(points[:-1]):
+    #     for point2 in non_dominated_points_not_normalized:
+    #         # Usuwanie zdominowanych
+    #         if np.all(point1 > point2):
+    #             del_idx = np.all(np.equal(non_dominated_points_not_normalized, point1), axis=1)
+    #             non_dominated_points_not_normalized = np.delete(non_dominated_points_not_normalized, del_idx, 0)
+    #             break
+    #     else:
+    #         # Filtracja
+    #         for point2 in points[i:]:
+    #             if np.all(point1 < point2):
+    #                 del_idx = np.all(np.equal(non_dominated_points_not_normalized, point2), axis=1)
+    #                 non_dominated_points_not_normalized = np.delete(non_dominated_points_not_normalized, del_idx, 0)
+    #                 # print(f"{point1} deleted {point2}")
+
+
     # ======================================================================
     # punkty zdominowane
-    non_dominated_points = norm_points
+    non_dominated_points = points
     temp_dom = []
 
-    for i, point1 in enumerate(norm_points[:-1]):
+    for i, point1 in enumerate(points[:-1]):
         temp_dom.append(point1)
         for point2 in non_dominated_points:
             # Usuwanie zdominowanych
@@ -43,27 +81,16 @@ def topsis(points, weights, ideal_point):
                 break
         else:
             # Filtracja
-            for point2 in norm_points[i:]:
+            for point2 in points[i:]:
                 if np.all(point1 < point2):
                     del_idx = np.all(np.equal(non_dominated_points, point2), axis=1)
                     non_dominated_points = np.delete(non_dominated_points, del_idx, 0)
                     # print(f"{point1} deleted {point2}")
 
-    non_dominated_points_not_normalized = np.copy(points)
-    for i, point1 in enumerate(points[:-1]):
-        for point2 in non_dominated_points_not_normalized:
-            # Usuwanie zdominowanych
-            if np.all(point1 > point2):
-                del_idx = np.all(np.equal(non_dominated_points_not_normalized, point1), axis=1)
-                non_dominated_points_not_normalized = np.delete(non_dominated_points_not_normalized, del_idx, 0)
-                break
-        else:
-            # Filtracja
-            for point2 in points[i:]:
-                if np.all(point1 < point2):
-                    del_idx = np.all(np.equal(non_dominated_points_not_normalized, point2), axis=1)
-                    non_dominated_points_not_normalized = np.delete(non_dominated_points_not_normalized, del_idx, 0)
-                    # print(f"{point1} deleted {point2}")
+    normal_points = non_dominated_points
+    norm_points = normalize(points, weights)
+    non_dominated_points = normalize(non_dominated_points, weights)
+
     # ======================================================================
     # punkt idealny, antyidealny i nadir
 
@@ -95,9 +122,9 @@ def topsis(points, weights, ideal_point):
     # idx_eq = np.all(norm_points == non_dominated_points, axis=1)
     # idx_eq = (norm_points[:, None] == non_dominated_points[None, :]).all(1).any(0)
 
-    ci_idx_sort = np.tile(ci_idx_sort, (non_dominated_points_not_normalized.shape[1], 1))
+    ci_idx_sort = np.tile(ci_idx_sort, (normal_points.shape[1], 1))
 
-    non_dominated_points_sorted = np.take_along_axis(non_dominated_points_not_normalized, ci_idx_sort.T, axis=0)
+    non_dominated_points_sorted = np.take_along_axis(normal_points, ci_idx_sort.T, axis=0)
     # non_dominated_points_sorted = denormalize(non_dominated_points_sorted, weights)
 
     points_with_ci = np.append(non_dominated_points_sorted, ci_lst_sorted, axis=1)
