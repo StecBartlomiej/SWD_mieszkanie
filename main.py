@@ -4,8 +4,6 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-# TODO 3.1 - add subwindow for uta
-
 
 if __name__ == '__main__':
     excel_data = pd.read_excel("SWD_baza_danych.xlsx", dtype='int32')
@@ -28,8 +26,9 @@ if __name__ == '__main__':
     weights = [1 / 7 for _ in range(7)]
     open_weights = partial(show_weights, window, weights)
 
-    przedzialy = [2, 2, 2, 2, 2, 2, 2]
-    wartosci = [[5, 0, 0], [0, 0, 0], [0, 0, 0], [5, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    przedzialy = [5, 3, 2, 4, 2, 2, 2]
+    wartosci = [[1, 0.4, 0.2, 0.1, 0.03, 0], [1, 0.3, 0.1, 0], [1, 0.3, 0], [1, 0.3, 0.2, 0.05, 0], [1, 0.3, 0],
+                [1, 0.3, 0], [1, 0.3, 0]]
 
     # Methods
     topsis = partial(run_topsis, window, excel_data.to_numpy(), weights, ideal_point)
