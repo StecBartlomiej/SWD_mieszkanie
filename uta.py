@@ -24,34 +24,34 @@ def sorting_data(data: list):
 # Funkcja do pobrania ilości przedziałów dla każdego kryterium od użytkownika
 def collect_no_of_sections(criteria: list):
     no_of_sections = []
-    for name in criteria[:-2]:
+    for name in criteria[:-3]:
         input_string = "Podaj ilość przedziałów dla kryterium '" + str(name) + "': "
         no_of_sections.append(int(input(input_string)))
     no_of_sections.append(2)
     no_of_sections.append(2)
 
-    if not all(val >= 2 for val in no_of_sections):
-        print("Każde kryterium musi mieć więcej niż jeden przedział")
+    if not all(val >= 1 for val in no_of_sections):
+        print("Każde kryterium musi mieć przynajmniej jeden przedział")
         no_of_sections = collect_no_of_sections(criteria)
     return no_of_sections
 
 
 # Funkcja do dzielenia każdego kryterium na równe przedziały
 def create_sections(data:list, criteria:list, no_of_sections:list):
-    min_values = [min(value_list) for value_list in data]
-    max_values = [max(value_list) for value_list in data]
+    min_values = [min(value_list) for value_list in data[:-1]]
+    max_values = [max(value_list) for value_list in data[:-1]]
 
-    increment = [(max_values[i] - min_values[i]) / no_of_sections[i] for i in range(len(data))]
+    increment = [(max_values[i] - min_values[i]) / no_of_sections[i] for i in range(len(data)-1)]
 
     sections = [[val] for val in min_values]
-    for i in range(len(data)):
+    for i in range(len(data)-1):
         incrementing_number = min_values[i]
         for _ in range(no_of_sections[i]-1):
             incrementing_number += increment[i]
             sections[i].append(incrementing_number)
         sections[i].append(max_values[i])
 
-    for i in range(3, len(data)):
+    for i in range(3, len(data)-1):
         sections[i] = sections[i][::-1]
 
     sections_as_tuples = []
@@ -63,14 +63,14 @@ def create_sections(data:list, criteria:list, no_of_sections:list):
 
 
 # Funkcja do wpisywania wartości funkcji użyteczności
-def set_values_of_usability_functions(sections: list, criteria: list):
+def set_values_of_usability_functions(sections: list, criteria: list, weights: list):
     values_of_usability_functions = []
-    for i in range(len(sections)):
+    for i in range(len(criteria)-1):
+        current_weight = weights[i]
         value_list = []
-        print("Dla kryterium '", criteria[i], "' wybierz wartości funkcji użyteczności dla punktów:", sep='')
         for j in range(len(sections[i]) - 1):
-            point_string = str(criteria[i]) + "; " + str(sections[i][j]) + ": "
-            value_list.append(float(input(point_string)))
+            value_list.append(current_weight)
+            current_weight *= 0.6
         value_list.append(0)
         values_of_usability_functions.append(value_list)
 
@@ -103,7 +103,7 @@ def usability_functions(sections: list, usability_values: list):
 # Funkcja wyznaczająca wartość ux
 def function_value(flat_idx: int, a: list, b: list, data: list, sections_tuple: list):
     score = 0
-    for i in range(len(data)):
+    for i in range(len(data)-1):
         for section in sections_tuple[i]:
             if min(section) <= data[i][flat_idx] <= max(section):
                 section_idx = sections_tuple[i].index(section)
@@ -129,14 +129,17 @@ def calculate_ranking(scoring: list, data: list):
 
 
 # Funkcja wykonująca cały algorytm UTA STAR
-def uta(file_path: str, no_of_sections=None, usability_values=None):
+def uta(file_path: str, no_of_sections=None, weights=None):
+    if no_of_sections is None:
+        no_of_sections = [1, 1, 1, 1, 1, 1, 1]
+    if weights is None:
+        weights = [1, 1, 1, 1, 1, 1, 1]
+
     criteria, data = load_data(file_path)
     sorted_data = sorting_data(data)
-    if no_of_sections is None:
-        no_of_sections = collect_no_of_sections(criteria)
     sections, sections_tuples = create_sections(sorted_data, criteria, no_of_sections)
-    if usability_values is None:
-        usability_values = set_values_of_usability_functions(sections, criteria)
+    usability_values = set_values_of_usability_functions(sections, criteria, weights)
+
     sum_for_ideal_point = sum([val[0] for val in usability_values])
     if sum_for_ideal_point != 1:
         for i in range(len(usability_values)):
@@ -164,7 +167,7 @@ def uta(file_path: str, no_of_sections=None, usability_values=None):
         rank = np.append(rank, tmp_lst, axis=0)
 
     value = np.vstack(value)
-    rank = rank.reshape((len(value), 7))
+    rank = rank.reshape((len(value), 8))
     rank = np.append(rank, value, axis=1)
 
     return rank
@@ -179,5 +182,5 @@ if __name__ == '__main__':
     #przedzialy = [5,2,3,3,2,2,2] # każdy element chyba powinien być większy lub równy 2 ale nie jestem pewny
     #wartosci = [[3, 0.3, 0.1, 0.07, 0.05, 0],[0.2, 0.12, 0],[0.2, 0.1, 0.07, 0],[3, 0.2, 0.1, 0],[0.1, 0.07, 0],[0.1, 0.03, 0],[0.1, 0.09, 0]]
     przedzialy = [2,2,2,2,2,2,2]
-    wartosci = [[5,0,0],[0,0,0],[0,0,0],[5,0,0],[0,0,0],[0,0,0],[0,0,0]]
+    wartosci = [2,2,2,2,2,2,2]
     uta("SWD_baza_danych.xlsx", przedzialy, wartosci)

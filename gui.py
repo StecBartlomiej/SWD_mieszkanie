@@ -22,7 +22,7 @@ columns_name = [
 
 
 def show_ranking(root, df: pd.DataFrame, title: str):
-    w = 750
+    w = 850
     h = 300
 
     # get screen width and height
@@ -141,10 +141,11 @@ def open_ideal(root, ideal_point):
     button.grid(row=max_row, column=1)
 
 
-def run_uta(window, no_of_sections = None, usability_values = None):
-    rank = uta("SWD_baza_danych.xlsx", no_of_sections, usability_values)
+def run_uta(window, no_of_sections=None, usability_values=None):
+    rank = uta("SWD_baza_danych.xlsx", None, None)  # TODO - dodać przedziały z gui
 
     names = columns_name.copy()
+    names.append("id")
     names.append("Funkcja użyteczności")
 
     df = pd.DataFrame(rank, columns=names)
@@ -152,9 +153,11 @@ def run_uta(window, no_of_sections = None, usability_values = None):
 
 
 def run_rsm(window, point_lst, Aquo, Adoc):
-    array = get_rsm(point_lst[:, 1:], Aquo, Adoc)
+    array = get_rsm(point_lst, Aquo, Adoc)
+    # print(array)
 
     names = columns_name.copy()
+    names.append("id")
     names.append("ci")
 
     df_rank = pd.DataFrame(array, columns=names)
@@ -182,16 +185,19 @@ def get_rsm(point_lst, Aquo, Adoc):
 
     array = np.array([])
     array1 = np.array([])
+    array2 = np.array([])
 
     for i, x in enumerate(rank):
         array = np.append(array, x[0], axis=0)
         array1 = np.append(array1, [x[1]], axis=0)
+        array2 = np.append(array2, [x[2]], axis=0)
 
     array = array.reshape((len(rank), 7))
     array[:, range(3, 7)] = -array[:, range(3, 7)]
     array = np.append(array, np.vstack(array1), axis=1)
+    array = np.append(array, np.vstack(array2), axis=1)
 
-    array[:, range(3, 7)] = array[:, range(3, 7)]
+    # array[:, range(3, 7)] = array[:, range(3, 7)]
 
     if Adoc[0][6] == 0:
         array[:, 6] = -array[:, 6]
@@ -242,10 +248,10 @@ def get_topsis(points, weights, ideal_point):
     return rank
 
 
-def run_all(window, points, ideal_point, weights, Aquo, Adoc, no_of_sections, usability_values):
-    topsis_rank = get_topsis(points, weights, ideal_point)
-    rsm_rank = get_rsm(points, Aquo, Adoc)
-    uta_rank = uta("SWD_baza_danych.xlsx", no_of_sections, usability_values)
+# def run_all(window, points, ideal_point, weights, Aquo, Adoc, no_of_sections, usability_values):
+#     topsis_rank = get_topsis(points, weights, ideal_point)
+#     rsm_rank = get_rsm(points, Aquo, Adoc)
+#     uta_rank = uta("SWD_baza_danych.xlsx", no_of_sections, usability_values)
 
 
 def non_dominated(points):
