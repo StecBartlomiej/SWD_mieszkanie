@@ -11,7 +11,7 @@ if __name__ == '__main__':
     excel_data = pd.read_excel("SWD_baza_danych.xlsx", dtype='int32')
     ideal_point = np.array([[0, 0, 0, 100, 10, 1, 1]])
     # anty_ideal_point = np.array([[1e10, 1e10, 1e10, 0, 0, 0, 0]])
-    anty_ideal_point = non_dominated(excel_data.to_numpy())
+    anty_ideal_point = non_dominated(excel_data.to_numpy()[:, range(7)])
 
     # Window App
     window = tk.Tk()

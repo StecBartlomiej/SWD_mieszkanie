@@ -223,19 +223,14 @@ def get_rsm(point_lst, Aquo, Adoc):
 
     array = np.array([])
     array1 = np.array([])
-    array2 = np.array([])
 
     for i, x in enumerate(rank):
         array = np.append(array, x[0], axis=0)
         array1 = np.append(array1, [x[1]], axis=0)
-        array2 = np.append(array2, [x[2]], axis=0)
 
-    array = array.reshape((len(rank), 7))
+    array = array.reshape((len(rank), 8))
     array[:, range(3, 7)] = -array[:, range(3, 7)]
     array = np.append(array, np.vstack(array1), axis=1)
-    array = np.append(array, np.vstack(array2), axis=1)
-
-    # array[:, range(3, 7)] = array[:, range(3, 7)]
 
     if Adoc[0][6] == 0:
         array[:, 6] = -array[:, 6]
