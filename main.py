@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # Methods
     topsis = partial(run_topsis, window, excel_data.to_numpy(), weights, ideal_point)
     go_rsm = partial(run_rsm, window, excel_data.to_numpy(), ideal_point, anty_ideal_point)
-    go_uta = partial(run_uta, window, przedzialy, wartosci)
+    go_uta = partial(run_uta, window, weights)
     run_ideal = partial(open_ideal, window, ideal_point)
     # run_all = partial()
 

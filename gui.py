@@ -10,9 +10,9 @@ from topis_implementacja import topsis
 from uta import uta
 
 
-
 is_weights_window_open = False
 is_rsm_open = False
+is_uta_open = False
 
 
 columns_name = [
@@ -80,13 +80,13 @@ def show_weights(window, weights):
     def on_close():
         global is_weights_window_open
         is_weights_window_open = False
+        subwindow.destroy()
 
     def copy_close():
         copy_weights()
         on_close()
-        subwindow.destroy()
 
-    subwindow.protocol("WM_DELETE_WINDOW", on_close())
+    subwindow.protocol("WM_DELETE_WINDOW", on_close)
 
     button = tk.Button(subwindow, text="Ok", command=copy_close)
     max_row = len(num_lst)
@@ -128,28 +128,66 @@ def open_ideal(root, ideal_point):
     def on_close():
         global is_rsm_open
         is_rsm_open = False
+        subwindow.destroy()
 
     def copy_close():
         on_close()
         copy_weights()
-        subwindow.destroy()
 
-    subwindow.protocol("WM_DELETE_WINDOW", on_close())
+    subwindow.protocol("WM_DELETE_WINDOW", on_close)
 
     button = tk.Button(subwindow, text="Ok", command=copy_close)
     max_row = 7
     button.grid(row=max_row, column=1)
 
 
-def run_uta(window, no_of_sections=None, usability_values=None):
-    rank = uta("SWD_baza_danych.xlsx", None, None)  # TODO - dodać przedziały z gui
+def run_uta(root, weight):
+    global is_uta_open
+    if is_uta_open:
+        return
 
-    names = columns_name.copy()
-    names.append("id")
-    names.append("Funkcja użyteczności")
+    is_uta_open = True
 
-    df = pd.DataFrame(rank, columns=names)
-    show_ranking(window, df, "Ranking UTA")
+    window = tk.Toplevel(root)
+    window.wm_title("UTA")
+
+    window.rowconfigure(0, weight=1)
+    window.columnconfigure(0, weight=1)
+    window.resizable(False, False)
+
+    div_lst = [1 for _ in range(7)]
+
+    num_lst = [tk.IntVar(window, value=x) for _, x in enumerate(div_lst)]
+
+    for idx, x in enumerate(num_lst):
+        tk.Label(window, text=f"{columns_name[idx]}").grid(row=idx, column=0, padx=5)
+        tk.Entry(window, textvariable=x).grid(row=idx, column=1, padx=4, sticky='news')
+
+    def on_close():
+        global is_uta_open
+        is_uta_open = False
+        window.destroy()
+
+    def on_ok():
+        for idx, x in enumerate(num_lst):
+            div_lst[idx] = x.get() if x.get() >= 1 else 1
+
+        rank = uta("SWD_baza_danych.xlsx", div_lst, weight)
+
+        names = columns_name.copy()
+        names.append("id")
+        names.append("Funkcja użyteczności")
+
+        df = pd.DataFrame(rank, columns=names)
+        show_ranking(root, df, "Ranking UTA")
+
+        on_close()
+
+    window.protocol("WM_DELETE_WINDOW", on_close)
+
+    button = tk.Button(window, text="Ok", command=on_ok)
+    max_row = 7
+    button.grid(row=max_row, column=1)
 
 
 def run_rsm(window, point_lst, Aquo, Adoc):
