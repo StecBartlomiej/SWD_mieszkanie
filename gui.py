@@ -72,9 +72,10 @@ def show_weights(window, weights):
             weights[idx] = x.get()
 
         if not isclose(sum(weights), 1):
+            s = sum(weights)
             for i in range(7):
-                weights[i] = 1/7
-                num_lst[i]= tk.DoubleVar(subwindow, value=weights[i])
+                weights[i] /= s
+                num_lst[i] = tk.DoubleVar(subwindow, value=weights[i])
 
     def on_close():
         global is_weights_window_open
@@ -151,7 +152,7 @@ def run_uta(window, no_of_sections = None, usability_values = None):
 
 
 def run_rsm(window, point_lst, Aquo, Adoc):
-    array = get_rsm(point_lst, Aquo, Adoc)
+    array = get_rsm(point_lst[:, 1:], Aquo, Adoc)
 
     names = columns_name.copy()
     names.append("ci")
@@ -198,13 +199,14 @@ def get_rsm(point_lst, Aquo, Adoc):
     if Adoc[0][5] == 0:
         array[:, 5] = -array[:, 5]
 
-    array = array[::-1]
+    # array = array[::-1]
     return array
 
 
 def run_topsis(window, points, weights, ideal_point):
     rank = get_topsis(points, weights, ideal_point)
     names = columns_name.copy()
+    names.append("id")
     names.append("ci")
 
     df_rank = pd.DataFrame(rank, columns=names, dtype="float")

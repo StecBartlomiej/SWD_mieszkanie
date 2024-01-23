@@ -4,6 +4,8 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+# TODO - Dodać id
+# TODO - dodać do uta
 
 if __name__ == '__main__':
     excel_data = pd.read_excel("SWD_baza_danych.xlsx", dtype='int32')

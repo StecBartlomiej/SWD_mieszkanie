@@ -68,6 +68,9 @@ def topsis(points, weights, ideal_point):
 
     # ======================================================================
     # punkty zdominowane
+    # points_id = np.copy(points)
+    # points = points[:, range(7)]
+
     non_dominated_points = points
     temp_dom = []
 
@@ -75,27 +78,30 @@ def topsis(points, weights, ideal_point):
         temp_dom.append(point1)
         for point2 in non_dominated_points:
             # Usuwanie zdominowanych
-            if np.all(point1 > point2):
+            if np.all(point1[range(7)] > point2[range(7)]):
                 del_idx = np.all(np.equal(non_dominated_points, point1), axis=1)
                 non_dominated_points = np.delete(non_dominated_points, del_idx, 0)
                 break
         else:
             # Filtracja
             for point2 in points[i:]:
-                if np.all(point1 < point2):
+                if np.all(point1[range(7)] < point2[range(7)]):
                     del_idx = np.all(np.equal(non_dominated_points, point2), axis=1)
                     non_dominated_points = np.delete(non_dominated_points, del_idx, 0)
                     # print(f"{point1} deleted {point2}")
 
-    normal_points = non_dominated_points
-    norm_points = normalize(points, weights)
+    points_with_id = non_dominated_points
+    # normal_points = non_dominated_points[]
+
+    # norm_points = normalize(points, weights)
+    non_dominated_points = non_dominated_points[:, range(7)]
     non_dominated_points = normalize(non_dominated_points, weights)
 
     # ======================================================================
     # punkt idealny, antyidealny i nadir
 
     # ideal_point = np.min(non_dominated_points, axis=0)
-    nonideal_point = np.max(norm_points, axis=0)
+    # nonideal_point = np.max(norm_points, axis=0)
     nadir = np.max(non_dominated_points, axis=0)
 
     # ======================================================================
@@ -122,20 +128,12 @@ def topsis(points, weights, ideal_point):
     # idx_eq = np.all(norm_points == non_dominated_points, axis=1)
     # idx_eq = (norm_points[:, None] == non_dominated_points[None, :]).all(1).any(0)
 
-    ci_idx_sort = np.tile(ci_idx_sort, (normal_points.shape[1], 1))
+    ci_idx_sort = np.tile(ci_idx_sort, (points_with_id.shape[1], 1))
 
-    non_dominated_points_sorted = np.take_along_axis(normal_points, ci_idx_sort.T, axis=0)
+    non_dominated_points_sorted = np.take_along_axis(points_with_id, ci_idx_sort.T, axis=0)
     # non_dominated_points_sorted = denormalize(non_dominated_points_sorted, weights)
 
     points_with_ci = np.append(non_dominated_points_sorted, ci_lst_sorted, axis=1)
 
     return points_with_ci
 
-    # adres = 0
-    # top = np.argmax(ci_lst, axis=0)
-    # for i in range(len(temp_dom)):
-    #     if np.all(temp_dom[i] == non_dominated_points[top]):
-    #         adres = i
-    #         return ci_lst[top], adres
-    #
-    # return ci_lst[top], adres
